@@ -1,0 +1,26 @@
+{
+    "name": "laravel-mix-valet",
+    "version": "0.0.0",
+    "description": "Laravel Mix v6 extension that makes HMR work with Laravel Valet certificates",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/andreiio/laravel-mix-valet.git"
+    },
+    "keywords": [
+        "laravel",
+        "mix",
+        "plugin",
+        "valet",
+        "https"
+    ],
+    "author": "Andrei Ioniță",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/andreiio/laravel-mix-valet/issues"
+    },
+    "homepage": "https://github.com/andreiio/laravel-mix-valet#readme",
+    "peerDependencies": {
+        "laravel-mix": "^6.0.0"
+    }
+}
