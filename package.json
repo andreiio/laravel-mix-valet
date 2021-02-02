@@ -1,6 +1,6 @@
 {
     "name": "laravel-mix-valet",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "description": "Laravel Mix v6 extension that makes HMR work with Laravel Valet certificates",
     "main": "index.js",
     "repository": {
