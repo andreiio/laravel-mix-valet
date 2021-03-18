@@ -43,7 +43,7 @@ class LaravelMixValet {
             return;
         }
 
-        const hotFile = path.resolve(__dirname, '../public/hot');
+        const hotFile = path.resolve('public', 'hot');
 
         if (!fs.existsSync(hotFile)) {
             return;
