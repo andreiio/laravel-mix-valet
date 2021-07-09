@@ -32,6 +32,7 @@ class LaravelMixValet {
 
         Config.merge({
             hmrOptions: {
+                https: this.config.https,
                 host: this.config.host,
                 port: this.config.port,
             },
