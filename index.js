@@ -81,7 +81,6 @@ class LaravelMixValet {
         }
 
         config.devServer.hot = true;
-        config.devServer.firewall = false;
 
         config.output.publicPath =
             (this.config.https ? 'https' : 'http') +
