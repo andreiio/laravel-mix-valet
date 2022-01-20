@@ -1,11 +1,15 @@
 const path = require('path');
 const fs = require('fs');
 const mix = require('laravel-mix');
-const Log = require('laravel-mix/src/Log');
+const merge = require('lodash/merge');
 
 class LaravelMixValet {
     constructor() {
-        this.config = {};
+        this.config = {
+            host: this.getAppHost(),
+            port: 8080,
+            https: true,
+        };
     }
 
     name() {
@@ -13,45 +17,17 @@ class LaravelMixValet {
     }
 
     register(config = {}) {
-        const defaults = {
-            host: null,
-            port: 8080,
-            https: true,
-            removeHotTrailingSlash: true,
-        };
+        if (!this.isHot()) {
+            return;
+        }
 
         if (typeof config === 'string') {
             config = { host: config };
         }
 
-        if (!config.host) {
-            Log.error(
-                'Valet host not configured. Disabling laravel-mix-valet...'
-            );
-            return;
-        }
+        merge(this.config, config);
 
-        let key = this.getCertPath('key', config.host);
-        if (!fs.existsSync(key)) {
-            Log.message({
-                text: `Could not find key at ${key}. Disabling laravel-mix-valet...`,
-                type: 'warn',
-            });
-            return;
-        }
-
-        let crt = this.getCertPath('crt', config.host);
-        if (!fs.existsSync(crt)) {
-            Log.message({
-                text: `Could not find certificate at ${crt}. Disabling laravel-mix-valet...`,
-                type: 'warn',
-            });
-            return;
-        }
-
-        this.config = { ...defaults, ...config };
-
-        Config.merge({
+        mix.options({
             hmrOptions: {
                 https: this.config.https,
                 host: this.config.host,
@@ -61,52 +37,70 @@ class LaravelMixValet {
     }
 
     boot() {
-        if (!Config.hmr || !this.config.removeHotTrailingSlash) {
+        if (!this.isHot()) {
             return;
         }
 
+        this.updateHotFile();
+    }
+
+    webpackConfig(config) {
+        if (!this.isHot()) {
+            return;
+        }
+
+        config.devServer.hot = true;
+
+        config.output.publicPath = this.hotUrl();
+
+        if (this.config.https) {
+            config.devServer.https = {
+                key: this.loadCert('key'),
+                cert: this.loadCert('crt'),
+            };
+        }
+    }
+
+    loadCert(ext) {
+        const cert = path.resolve(
+            process.env.HOME,
+            `.config/valet/Certificates/${this.config.host}.${ext}`
+        );
+
+        if (!fs.existsSync(cert)) {
+            throw new Error(`Could not find ${cert}`);
+        }
+
+        return fs.readFileSync(cert);
+    }
+
+    updateHotFile() {
         const hotFile = path.resolve('public', 'hot');
 
         if (!fs.existsSync(hotFile)) {
             return;
         }
 
-        let url = fs.readFileSync(hotFile, 'utf8');
-
-        fs.writeFileSync(hotFile, url.replace(/\/$/gm, ''));
+        fs.writeFileSync(hotFile, this.hotUrl());
     }
-    webpackConfig(config) {
-        if (!Config.hmr) {
-            return;
-        }
 
-        config.devServer.hot = true;
-
-        config.output.publicPath =
+    hotUrl() {
+        return (
             (this.config.https ? 'https' : 'http') +
-            `://${this.config.host}:${this.config.port}/`;
-
-        if (this.config.https) {
-            config.devServer.https = {
-                key: fs.readFileSync(this.getCertPath('key')),
-                cert: fs.readFileSync(this.getCertPath('crt')),
-            };
-        }
+            `://${this.config.host}:${this.config.port}`
+        );
     }
 
-    getCertPath(ext, host) {
-        if (!['key', 'crt'].includes(ext)) {
-            return;
-        }
+    isHot() {
+        return process.argv.includes('--hot');
+    }
 
-        if (!host) {
-            host = this.config.host;
+    getAppHost() {
+        try {
+            return new URL(process.env.APP_URL).hostname;
+        } catch (error) {
+            return null;
         }
-
-        return path.resolve(
-            process.env.HOME,
-            `.config/valet/Certificates/${host}.${ext}`
-        );
     }
 }
 

@@ -11,14 +11,14 @@ Install the extension:
 npm install laravel-mix-valet --save-dev
 ```
 
-Next require the extension in your `webpack.mix.js` and call `valet(hostname)`:
+Next require the extension in your `webpack.mix.js` and call `valet()`:
 
 ```js
 const mix = require('laravel-mix');
 require('laravel-mix-valet');
 
 mix.js('resources/js/app.js', 'public/js')
-    .valet('mysite.test'); // replace with your hostname
+    .valet();
 ```
 
 Alternatively, you can pass a config object instead, which will be merged with the defaults below:
@@ -29,17 +29,15 @@ require('laravel-mix-valet');
 
 mix.js('resources/js/app.js', 'public/js')
     .valet({
-        host: 'mysite.test', // replace with your hostname
-        port: 8080,
-        ...
+        host: 'othersite.test',
+        port: 12345,
     });
 ```
 
 ## Options
 
-| Option                     | Default |
-| -------------------------- | ------- |
-| **host**                   | null    |
-| **port**                   | 8080    |
-| **https**                  | true    |
-| **removeHotTrailingSlash** | true    |
+| Option    | Default                 |
+| --------- | ----------------------- |
+| **host**  | Hostname from `APP_URL` |
+| **port**  | 8080                    |
+| **https** | true                    |
