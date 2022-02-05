@@ -40,8 +40,6 @@ class LaravelMixValet {
         if (!this.isHot()) {
             return;
         }
-
-        this.updateHotFile();
     }
 
     webpackConfig(config) {
@@ -74,20 +72,10 @@ class LaravelMixValet {
         return fs.readFileSync(cert);
     }
 
-    updateHotFile() {
-        const hotFile = path.resolve('public', 'hot');
-
-        if (!fs.existsSync(hotFile)) {
-            return;
-        }
-
-        fs.writeFileSync(hotFile, this.hotUrl());
-    }
-
     hotUrl() {
         return (
             (this.config.https ? 'https' : 'http') +
-            `://${this.config.host}:${this.config.port}`
+            `://${this.config.host}:${this.config.port}/`
         );
     }
 
