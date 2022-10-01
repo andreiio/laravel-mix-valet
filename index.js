@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const mix = require('laravel-mix');
-const merge = require('lodash/merge');
 
 class LaravelMixValet {
     constructor() {
@@ -25,7 +24,10 @@ class LaravelMixValet {
             config = { host: config };
         }
 
-        merge(this.config, config);
+        this.config = {
+            ...this.config,
+            ...config,
+        };
 
         mix.options({
             hmrOptions: {
