@@ -62,9 +62,23 @@ class LaravelMixValet {
     }
 
     loadCert(ext) {
+        let dir;
+
+        if (process.platform === 'linux') {
+            dir = '.valet';
+        } 
+        
+        if (['darwin', 'win32'].includes(process.platform)) {
+            dir = '.config/valet';
+        }
+
+        if (!dir) {
+            throw new Error(`Unsupported platform: ${process.platform}`);
+        }
+
         const cert = path.resolve(
             process.env.HOME,
-            `.config/valet/Certificates/${this.config.host}.${ext}`
+            `${dir}/Certificates/${this.config.host}.${ext}`
         );
 
         if (!fs.existsSync(cert)) {
